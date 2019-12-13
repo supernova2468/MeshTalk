@@ -1,5 +1,6 @@
 # app specific stuff
-
+# rst
+_build
 
 # from Github https://github.com/github/gitignore/blob/master/Python.gitignore
 # Byte-compiled / optimized / DLL files

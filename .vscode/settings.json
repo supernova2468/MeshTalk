@@ -9,5 +9,6 @@
         "--follow-imports=silent",
         "--show-column-numbers",
         "--strict"
-    ]
+    ],
+    "restructuredtext.confPath": "${workspaceFolder}"
 }
