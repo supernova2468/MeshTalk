@@ -2,3 +2,5 @@ pylint
 yapf
 mypy
 pytest
+Sphinx
+doc8
