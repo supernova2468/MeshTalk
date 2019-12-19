@@ -1,7 +1,0 @@
-pylint
-yapf
-mypy
-pytest
-sphinx
-sphinx-autobuild
-doc8
