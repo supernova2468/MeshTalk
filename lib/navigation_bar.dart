@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import 'group_view.dart';
-import 'peers_view.dart';
+import 'package:omsat_app/group_view.dart';
+import 'package:omsat_app/peers_view.dart';
+import 'package:omsat_app/peers.dart';
 
 class OmsatNavigationToolbar extends StatefulWidget {
-  OmsatNavigationToolbar({Key key}) : super(key: key);
-
   @override
   _OmsatNavigationToolbarState createState() => _OmsatNavigationToolbarState();
 }
 
 class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  bool _fabVisible = false;
+  TextEditingController _newPeerField = TextEditingController();
+
   static List<Widget> _widgetOptions = <Widget>[
     GroupViewWidget(),
     PeerViewWidget(),
@@ -22,7 +23,39 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      if (index == 1) {
+        _fabVisible = true;
+      } else {
+        _fabVisible = false;
+      }
     });
+  }
+
+  Future<void> _addNewPeerDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Manually Add Peer'),
+          content: TextField(
+            controller: _newPeerField,
+            decoration: InputDecoration(labelText: 'Hostname or IP address'),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Add'),
+              onPressed: () {
+                Provider.of<PeerList>(context, listen: false)
+                    .addPeer(Peer(_newPeerField.text));
+                _newPeerField.clear();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -49,9 +82,12 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
           selectedItemColor: Colors.amber[800],
           onTap: _onItemTapped,
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () => print('pressed'),
-          child: Icon(Icons.add),
+        floatingActionButton: Visibility(
+          child: FloatingActionButton(
+            onPressed: () => _addNewPeerDialog(),
+            child: Icon(Icons.add),
+          ),
+          visible: _fabVisible,
         ));
   }
 }
