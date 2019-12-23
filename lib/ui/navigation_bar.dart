@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'package:omsat_app/group_view.dart';
-import 'package:omsat_app/peers_view.dart';
-import 'package:omsat_app/peers.dart';
+import 'package:omsat_app/ui/group_view.dart';
+import 'package:omsat_app/ui/peers_view.dart';
+import 'package:omsat_app/logic/peers.dart';
+import 'package:omsat_app/logic/peer_ui_wrapper.dart';
 
 class OmsatNavigationToolbar extends StatefulWidget {
   @override
@@ -46,7 +47,7 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
             FlatButton(
               child: Text('Add'),
               onPressed: () {
-                Provider.of<PeerList>(context, listen: false)
+                Provider.of<PeerListUI>(context, listen: false)
                     .addPeer(Peer(_newPeerField.text));
                 _newPeerField.clear();
                 Navigator.of(context).pop();

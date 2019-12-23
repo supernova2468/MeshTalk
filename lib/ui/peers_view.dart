@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:omsat_app/peers.dart';
 import 'package:provider/provider.dart';
+
+import 'package:omsat_app/logic/peers.dart';
+import 'package:omsat_app/logic/peer_ui_wrapper.dart';
 
 class PeerViewWidget extends StatelessWidget {
   Color _getIconColor(Peer peer) {
@@ -33,7 +35,7 @@ class PeerViewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<PeerList>(builder: (_, peerList, __) {
+    return Consumer<PeerListUI>(builder: (_, peerList, __) {
       return ListView.separated(
         itemCount: peerList.peers.length,
         itemBuilder: (_, int index) {
