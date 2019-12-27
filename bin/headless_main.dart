@@ -12,7 +12,7 @@ main(List<String> arguments) {
 
   TcpListener(myPeerList, listeningPort).startListening();
 
-  var templateMessage = StatusMessage(listeningPort);
+  var templateMessage = StatusMessage(listeningPort, myPeerList);
 
   Connector(myPeerList, templateMessage).startConnecting();
 }

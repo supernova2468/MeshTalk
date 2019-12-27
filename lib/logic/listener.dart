@@ -44,25 +44,39 @@ class TcpConnection {
 
   void _onData(String data) {
     print('got raw data: $data');
-    String remainStr = data;
-    //always see if there could be at least one json with a starting { and ending }
-    while (remainStr.contains('{') &&
-        remainStr.contains('}', remainStr.indexOf('{'))) {
-      int jsonStart = remainStr.indexOf('{');
-      int jsonEnd = remainStr.indexOf('}') + 1;
-      String nextJsonStr = remainStr.substring(jsonStart, jsonEnd);
+
+    var potentialJsons = _splitJson(data);
+    for (var potentialJson in potentialJsons) {
       //handle bad json and wrong json
       try {
-        var newMessage = StatusMessage.fromJson(jsonDecode(nextJsonStr));
+        var newMessage = StatusMessage.fromJson(jsonDecode(potentialJson));
         print('got data: $newMessage');
         _lastMessageReceived = newMessage;
         _peerList.addUpdatePeers(newMessage, _socket.remoteAddress.host);
       } on FormatException catch (e) {
         print(e);
-      } finally {
-        remainStr = remainStr.substring(jsonEnd);
       }
     }
+  }
+
+  List<String> _splitJson(String combinedJsons) {
+    var roughSplits = combinedJsons.split('}{');
+    List<String> finalList = [];
+    if (roughSplits.length == 1) {
+      finalList = roughSplits;
+    } else {
+      for (int i = 0; i < roughSplits.length; i++) {
+        if (i == 0) {
+          finalList.add(roughSplits[i] + '}');
+        } else if (i < roughSplits.length) {
+          finalList.add('{' + roughSplits[i] + '}');
+        } else {
+          finalList.add('{' + roughSplits[i]);
+        }
+      }
+    }
+
+    return finalList;
   }
 
   void _onDone() {

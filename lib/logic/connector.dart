@@ -55,7 +55,7 @@ class Connection {
           backoff += 5;
         }
       } finally {
-        //TODO this needs to do some sort of notifyupdate
+        //TODO this needs to do some sort of notify update
         _peer.outgoingConnection = false;
       }
     }

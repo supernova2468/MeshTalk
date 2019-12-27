@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     TcpListener(peerList, Peer.defaultListeningPort).startListening();
-    var templateMessage = StatusMessage(Peer.defaultListeningPort);
+    var templateMessage = StatusMessage(Peer.defaultListeningPort, peerList);
     Connector(peerList, templateMessage).startConnecting();
 
     return MultiProvider(
