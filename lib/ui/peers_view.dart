@@ -20,7 +20,7 @@ class PeerViewWidget extends StatelessWidget {
 
       case (2):
         {
-          color = Colors.orange;
+          color = Colors.green;
           break;
         }
 

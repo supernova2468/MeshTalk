@@ -1,17 +1,18 @@
-import 'dart:io';
-
 import 'package:omsat_app/logic/listener.dart';
 import 'package:omsat_app/logic/peers.dart';
+import 'package:omsat_app/logic/connector.dart';
+import 'package:omsat_app/logic/status_message.dart';
 
-main() async {
+main(List<String> arguments) {
+  var listeningPort = int.parse(arguments[0]);
+
   var myPeerList = PeerList();
-  print('Hostname or IP');
-  String hostname = stdin.readLineSync();
-  print('Port');
-  String port = stdin.readLineSync();
-  var portInt = int.parse(port);
 
-  myPeerList.addPeer(Peer.withPort(hostname, portInt));
+  myPeerList.addPeer(Peer.withPort('192.168.1.77', Peer.defaultListeningPort));
 
-  await TcpListener(myPeerList, 12345).startListening();
+  TcpListener(myPeerList, listeningPort).startListening();
+
+  var templateMessage = StatusMessage(listeningPort);
+
+  Connector(myPeerList, templateMessage).startConnecting();
 }
