@@ -8,7 +8,8 @@ main(List<String> arguments) {
 
   var myPeerList = PeerList();
 
-  myPeerList.addPeer(Peer.withPort('192.168.1.77', Peer.defaultListeningPort));
+  myPeerList
+      .addPeer(Peer.withPort('192.168.86.123', Peer.defaultListeningPort));
 
   TcpListener(myPeerList, listeningPort).startListening();
 

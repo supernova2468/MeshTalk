@@ -5,8 +5,9 @@ class Peer {
   static final defaultListeningPort = 25578;
   String host;
   int port; //listening port of remote peer
-  bool outgoingConnection = false; //this client is connected out
+  bool _outgoingConnection = false; //this client is connected out
   bool incomingConnection = false; //that client is connected in
+  PeerList parentList;
 
   Peer(hostIn) {
     host = hostIn;
@@ -21,12 +22,18 @@ class Peer {
   // this should be unique
   String get peerID => host + ':' + port.toString();
 
+  bool get outgoingConnection => _outgoingConnection;
+
+  set outgoingConnection(bool value) {
+    //wrap the outgoing connection so that the ui can be updated when in ui mode
+    _outgoingConnection = value;
+    parentList.notifyListenersWrapper();
+  }
+
   Map<String, dynamic> toJson() {
     return {
       'host': host,
       'port': port,
-      'outgoingConnection': outgoingConnection,
-      'incomingConnection': incomingConnection,
     };
   }
 
@@ -48,16 +55,20 @@ class PeerList {
     _peers = [];
   }
 
-  void addPeer(Peer peer) {
-    for (var existingPeer in _peers) {
-      if (existingPeer.peerID == peer.peerID) {
-        throw new Exception('duplicate peer host port combo');
+  void addPeer(Peer peer, {bool ignoreDuplicate = false}) {
+    if (!ignoreDuplicate) {
+      for (var existingPeer in _peers) {
+        if (existingPeer.peerID == peer.peerID) {
+          throw new Exception('duplicate peer host port combo');
+        }
       }
     }
     if (_connector != null) {
       _connector.addConnection(peer);
     }
+    peer.parentList = this;
     _peers.add(peer);
+    notifyListenersWrapper();
   }
 
   void addUpdatePeers(StatusMessage newMessage, String remoteIp) {
@@ -69,7 +80,12 @@ class PeerList {
     } else {
       peer.incomingConnection = true;
     }
-    for (Peer incomingPeer in newMessage.peerList.peers) {
+    mergeInPeerList(newMessage.peerList);
+    notifyListenersWrapper();
+  }
+
+  void mergeInPeerList(PeerList peerListIn) {
+    for (Peer incomingPeer in peerListIn.peers) {
       if (findPeer(incomingPeer.host, incomingPeer.port) == null) {
         this.addPeer(incomingPeer);
         //TODO need to not add the localhost
@@ -80,6 +96,7 @@ class PeerList {
   void lostPeer(StatusMessage lastMessage, String remoteIp) {
     ///with the last message recieved mark this peer as no longer connected
     findPeer(remoteIp, lastMessage.listeningPort).incomingConnection = false;
+    notifyListenersWrapper();
   }
 
   Peer findPeer(String remoteIp, int listeningPort) {
@@ -116,5 +133,9 @@ class PeerList {
       peerList.add(Peer.fromJson(peerJson));
     }
     _peers = peerList;
+  }
+
+  void notifyListenersWrapper() {
+    // do nothing when not in ui
   }
 }
