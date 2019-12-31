@@ -8,6 +8,7 @@ class PeerListUI extends PeerList with ChangeNotifier {
   @override
   void addPeer(Peer peer, {bool ignoreDuplicate = false}) {
     super.addPeer(peer, ignoreDuplicate: ignoreDuplicate);
+    peer.parentListUI = this;
     updateSavedPeers(peer);
   }
 

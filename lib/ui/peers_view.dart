@@ -74,6 +74,7 @@ class PeerCard extends StatelessWidget {
                     'Outgoing Connection: ${peer.outgoingConnection}'),
                 PeerDataRow(Icons.call_received,
                     'Incoming Connection: ${peer.incomingConnection}'),
+                PeerDataRow(Icons.account_circle, 'UUID: ${peer.uuid}'),
               ],
             ),
           ),

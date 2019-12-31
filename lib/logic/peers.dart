@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:omsat_app/logic/status_message.dart';
 import 'package:omsat_app/logic/connector.dart';
 
@@ -7,8 +9,11 @@ class Peer {
   int port; //listening port of remote peer
   bool _outgoingConnection = false; //this client is connected out
   bool incomingConnection = false; //that client is connected in
-  PeerList parentList;
+  PeerList parentListUI; //if there is a ui capture that peerlist
   String name = 'Unknown Peer';
+  String uuid;
+  Double latitude;
+  Double
 
   Peer(String hostIn) {
     this.host = hostIn;
@@ -20,22 +25,28 @@ class Peer {
     this.port = portIn;
   }
 
-  // this should be unique
-  String get peerID => host + ':' + port.toString();
+  Peer.fromMessage(hostIn, StatusMessage message) {
+    this.host = hostIn;
+    this.port = message.listeningPort;
+    this.name = message.name;
+    this.uuid = message.uuid;
+  }
 
   bool get outgoingConnection => _outgoingConnection;
 
   set outgoingConnection(bool value) {
     //wrap the outgoing connection so that the ui can be updated when in ui mode
     _outgoingConnection = value;
-    parentList.notifyListenersWrapper();
+    if (parentListUI != null) parentListUI.notifyListenersWrapper();
   }
 
   Map<String, dynamic> toJson() {
+    /// create json for the status_message
     return {
       'host': host,
       'port': port,
       'name': name,
+      'uuid': uuid,
     };
   }
 
@@ -44,15 +55,18 @@ class Peer {
   }
 
   Peer.fromJson(Map<String, dynamic> json) {
+    /// pull in json values that are transferable
     host = json['host'];
     port = json['port'];
     name = json['name'];
+    uuid = json['uuid'];
   }
 }
 
 class PeerList {
   List<Peer> _peers;
   Connector _connector;
+  String clientUUID;
 
   PeerList() {
     _peers = [];
@@ -60,56 +74,74 @@ class PeerList {
 
   void addPeer(Peer peer, {bool ignoreDuplicate = false}) {
     if (!ignoreDuplicate) {
+      if (this.clientUUID == null) {
+        throw new Exception('no peerlist uuid set');
+      }
       for (var existingPeer in _peers) {
-        if (existingPeer.peerID == peer.peerID) {
-          throw new Exception('duplicate peer host port combo');
+        if (existingPeer.uuid != null && existingPeer.uuid == peer.uuid) {
+          throw new Exception('duplicate peer uuid');
         }
       }
     }
-    if (_connector != null) {
-      _connector.addConnection(peer);
+    if (!ignoreDuplicate || peer.uuid != clientUUID) {
+      _peers.add(peer);
+      if (_connector != null) {
+        _connector.addConnection(peer);
+      }
     }
-    peer.parentList = this;
-    _peers.add(peer);
     notifyListenersWrapper();
   }
 
   void addUpdatePeers(StatusMessage newMessage, String remoteIp) {
     ///takes a status message and the remoteIpAddress updates the peer
     ///if existing or creates a new one
-    var peer = findPeer(remoteIp, newMessage.listeningPort);
+    var peer = findPeer(newMessage.uuid);
+
     if (peer == null) {
-      var newPeer = Peer.withPort(remoteIp, newMessage.listeningPort);
-      newPeer.name = newMessage.name;
-      addPeer(newPeer);
+      peer = Peer.fromMessage(remoteIp, newMessage);
+      addPeer(peer);
     } else {
-      peer.incomingConnection = true;
+      //data we only fill when receiving from a message is filled here
       peer.name = newMessage.name;
+      peer.uuid = newMessage.uuid;
     }
+    peer.incomingConnection = true;
+
+    //merge in the list of peers from the message, in the future
+    // a web of trust could be added here
     mergeInPeerList(newMessage.peerList);
+
+    // update ui (if there is one)
     notifyListenersWrapper();
   }
 
   void mergeInPeerList(PeerList peerListIn) {
+    ///merge in an existing peer list
+    ///generally from a message or saved preferences
     for (Peer incomingPeer in peerListIn.peers) {
-      if (findPeer(incomingPeer.host, incomingPeer.port) == null) {
-        this.addPeer(incomingPeer);
-        //TODO need to not add the localhost
+      // don't add peers that are lacking basic info
+      if (incomingPeer.uuid == null || incomingPeer.uuid == 'null') {
+        break;
       }
+      // don't add duplicates
+      if (findPeer(incomingPeer.uuid) != null) {
+        break;
+      }
+
+      this.addPeer(incomingPeer);
     }
   }
 
-  void lostPeer(StatusMessage lastMessage, String remoteIp) {
+  void lostPeer(StatusMessage lastMessage) {
     ///with the last message recieved mark this peer as no longer connected
-    findPeer(remoteIp, lastMessage.listeningPort).incomingConnection = false;
+    findPeer(lastMessage.uuid).incomingConnection = false;
     notifyListenersWrapper();
   }
 
-  Peer findPeer(String remoteIp, int listeningPort) {
-    String incomingID = remoteIp + ':' + listeningPort.toString();
+  Peer findPeer(String uuidIn) {
     Peer foundPeer;
     for (var peer in _peers) {
-      if (peer.peerID == incomingID) {
+      if (peer.uuid == uuidIn) {
         foundPeer = peer;
       }
     }

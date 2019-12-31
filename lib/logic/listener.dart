@@ -53,7 +53,7 @@ class TcpConnection {
         print('got data: $newMessage');
         _lastMessageReceived = newMessage;
         _peerList.addUpdatePeers(newMessage, _socket.remoteAddress.host);
-      } on FormatException catch (e) {
+      } catch (e) {
         print(e);
       }
     }
@@ -81,10 +81,11 @@ class TcpConnection {
 
   void _onDone() {
     print('connection $_localConnectionCount lost');
-    _peerList.lostPeer(_lastMessageReceived, _socket.remoteAddress.host);
+    _peerList.lostPeer(_lastMessageReceived);
   }
 
   void _onError(var e) {
-    print('error: $e');
+    print('listener error: $e');
+    _peerList.lostPeer(_lastMessageReceived);
   }
 }

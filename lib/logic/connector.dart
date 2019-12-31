@@ -29,8 +29,8 @@ class Connector {
 class Connection {
   Peer _peer;
   StatusMessage _templateMessage;
-  static const int _messageInterval = 2;
-  static const int _maxBackoff = 30;
+  static const int _messageInterval = 10;
+  static const int _maxBackoff = 15;
 
   Connection(Peer peer, StatusMessage templateMessage) {
     _peer = peer;
@@ -43,16 +43,20 @@ class Connection {
     while (true) {
       Socket socket;
       try {
-        print('trying to connect to ${_peer.host}');
+        print(
+            'trying to connect to ${_peer.uuid} on ${_peer.host}:${_peer.port}');
         socket = await Socket.connect(_peer.host, _peer.port);
         backoff = 0;
         _peer.outgoingConnection = true;
         await _handleConnection(socket);
       } on SocketException catch (e) {
-        print(e);
-        await Future.delayed(Duration(seconds: backoff));
-        if (backoff < _maxBackoff) {
-          backoff += 5;
+        print('start connection error: $e');
+        _peer.outgoingConnection = false;
+        if (_peer.incomingConnection == false) {
+          await Future.delayed(Duration(seconds: backoff));
+          if (backoff < _maxBackoff) {
+            backoff += 5;
+          }
         }
       } finally {
         _peer.outgoingConnection = false;
@@ -61,17 +65,20 @@ class Connection {
   }
 
   Future<void> _handleConnection(Socket socket) async {
-    print('connected to ${_peer.peerID}');
+    print('connected to ${_peer.host}:${_peer.port}');
     try {
       while (true) {
-        var rawSend = jsonEncode(_templateMessage.toJson());
-        print('sending $rawSend to ${socket.remoteAddress}');
-        socket.write(rawSend);
-        await socket.flush();
+        // wait until the template message at least has the uuid
+        if (_templateMessage.uuid != null) {
+          var rawSend = jsonEncode(_templateMessage.toJson());
+          print('sending $rawSend to ${socket.remoteAddress}');
+          socket.write(rawSend);
+          await socket.flush();
+        }
         await Future.delayed(Duration(seconds: _messageInterval));
       }
     } catch (e) {
-      print(e);
+      print('handle connection error: $e');
     } finally {
       socket.close();
     }
