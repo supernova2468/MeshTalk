@@ -12,8 +12,6 @@ class Peer {
   PeerList parentListUI; //if there is a ui capture that peerlist
   String name = 'Unknown Peer';
   String uuid;
-  Double latitude;
-  Double
 
   Peer(String hostIn) {
     this.host = hostIn;
