@@ -8,15 +8,16 @@ class Peer {
   bool _outgoingConnection = false; //this client is connected out
   bool incomingConnection = false; //that client is connected in
   PeerList parentList;
+  String name = 'Unknown Peer';
 
-  Peer(hostIn) {
-    host = hostIn;
-    port = defaultListeningPort;
+  Peer(String hostIn) {
+    this.host = hostIn;
+    this.port = defaultListeningPort;
   }
 
   Peer.withPort(hostIn, int portIn) {
-    host = hostIn;
-    port = portIn;
+    this.host = hostIn;
+    this.port = portIn;
   }
 
   // this should be unique
@@ -34,6 +35,7 @@ class Peer {
     return {
       'host': host,
       'port': port,
+      'name': name,
     };
   }
 
@@ -44,6 +46,7 @@ class Peer {
   Peer.fromJson(Map<String, dynamic> json) {
     host = json['host'];
     port = json['port'];
+    name = json['name'];
   }
 }
 
@@ -76,9 +79,12 @@ class PeerList {
     ///if existing or creates a new one
     var peer = findPeer(remoteIp, newMessage.listeningPort);
     if (peer == null) {
-      addPeer(Peer.withPort(remoteIp, newMessage.listeningPort));
+      var newPeer = Peer.withPort(remoteIp, newMessage.listeningPort);
+      newPeer.name = newMessage.name;
+      addPeer(newPeer);
     } else {
       peer.incomingConnection = true;
+      peer.name = newMessage.name;
     }
     mergeInPeerList(newMessage.peerList);
     notifyListenersWrapper();
@@ -105,7 +111,6 @@ class PeerList {
     for (var peer in _peers) {
       if (peer.peerID == incomingID) {
         foundPeer = peer;
-        print('found peer');
       }
     }
     return foundPeer;

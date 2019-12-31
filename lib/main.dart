@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     _loadPeerList();
     TcpListener(peerList, Peer.defaultListeningPort).startListening();
-    var templateMessage = StatusMessage(Peer.defaultListeningPort, peerList);
+    var templateMessage =
+        StatusMessage(Peer.defaultListeningPort, peerList, 'TODO: add name');
     Connector(peerList, templateMessage).startConnecting();
 
     return MultiProvider(
