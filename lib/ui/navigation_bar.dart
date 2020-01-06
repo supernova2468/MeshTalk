@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/cupertino.dart';
 
 import 'package:omsat_app/ui/group_view.dart';
 import 'package:omsat_app/ui/peers_view.dart';
 import 'package:omsat_app/logic/peers.dart';
 import 'package:omsat_app/logic/peer_ui_wrapper.dart';
+import 'package:omsat_app/ui/settings_view.dart';
 
 class OmsatNavigationToolbar extends StatefulWidget {
   @override
@@ -64,6 +66,13 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
     return Scaffold(
         appBar: AppBar(
           title: const Text('OMSAT App'),
+          actions: <Widget>[
+            IconButton(
+              onPressed: () => Navigator.push(context,
+                  CupertinoPageRoute(builder: (context) => SettingsView())),
+              icon: Icon(Icons.settings_applications),
+            ),
+          ],
         ),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),

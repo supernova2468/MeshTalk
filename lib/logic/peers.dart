@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:omsat_app/logic/status_message.dart';
 import 'package:omsat_app/logic/connector.dart';
 

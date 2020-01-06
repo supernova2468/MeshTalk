@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
+import 'package:preferences/preferences.dart';
 
 import 'package:omsat_app/ui/navigation_bar.dart';
 import 'package:omsat_app/logic/peer_ui_wrapper.dart';
@@ -12,14 +13,18 @@ import 'package:omsat_app/logic/connector.dart';
 import 'package:omsat_app/logic/peers.dart';
 import 'package:omsat_app/logic/status_message.dart';
 
-void main() => runApp(MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await PrefService.init(prefix: 'pref_');
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
   static final peerList = PeerListUI();
   static final templateMessage =
       StatusMessage.limitedValues(Peer.defaultListeningPort, peerList);
 
-  _loadPreferences() async {
+  static loadPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     // uuid needs to be first in order to add peers correctly
@@ -38,6 +43,13 @@ class MyApp extends StatelessWidget {
       // save the peer list back now that it has been purged of bad peers
       prefs.setString('peerList', jsonEncode(peerList.toJson()));
     }
+
+    //name
+    var name = prefs.getString('pref_name');
+    if (name == null) {
+      name = 'No Name';
+    }
+    templateMessage.name = name;
   }
 
   @override
@@ -45,7 +57,7 @@ class MyApp extends StatelessWidget {
     TcpListener(peerList, Peer.defaultListeningPort).startListening();
     Connector(peerList, templateMessage).startConnecting();
 
-    _loadPreferences();
+    loadPreferences();
 
     return MultiProvider(
       providers: [
