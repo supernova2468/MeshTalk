@@ -1,8 +1,12 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:location/location.dart';
 import 'package:provider/provider.dart';
 
 import 'package:omsat_app/logic/peers.dart';
 import 'package:omsat_app/logic/peer_ui_wrapper.dart';
+import 'package:omsat_app/logic/location_manager_ui_wrapper.dart';
 
 class PeerViewWidget extends StatelessWidget {
   @override
@@ -24,7 +28,7 @@ class PeerCard extends StatelessWidget {
 
   PeerCard(this.peer);
 
-  Color _getIconColor(Peer peer) {
+  static Color _getIconColor(Peer peer) {
     var totalState = 0;
     if (peer.incomingConnection) totalState += 1;
     if (peer.outgoingConnection) totalState += 1;
@@ -52,6 +56,23 @@ class PeerCard extends StatelessWidget {
     return color;
   }
 
+  static String _getDistanceDescriptor(
+      LocationJsonable peerLocation, LocationData myLocation) {
+    // this is really simplistic and will be wrong at any meaningful distance
+    // need a fancier formula haversine or something
+    try {
+      var latDiff = myLocation.latitude - peerLocation.latitude;
+      var lonDiff = myLocation.longitude - peerLocation.longitude;
+      double earthRadius = 3958.8;
+      double distanceFeet =
+          earthRadius * math.sqrt(math.pow(latDiff, 2) + math.pow(lonDiff, 2));
+      return '${distanceFeet.abs().round()} ft';
+    } catch (e) {
+      print('distance calc error: $e');
+      return 'Unknown';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -75,6 +96,13 @@ class PeerCard extends StatelessWidget {
                 PeerDataRow(Icons.call_received,
                     'Incoming Connection: ${peer.incomingConnection}'),
                 PeerDataRow(Icons.account_circle, 'UUID: ${peer.uuid}'),
+                PeerDataRow(Icons.gps_fixed,
+                    'Location: ${peer.location.latitude}, ${peer.location.longitude}'),
+                Consumer<LocationManagerUI>(
+                  builder: (_, locationManager, __) => PeerDataRow(
+                      Icons.track_changes,
+                      'Distance: ${_getDistanceDescriptor(peer.location, locationManager.currentLocation)}'),
+                ),
               ],
             ),
           ),

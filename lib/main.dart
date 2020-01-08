@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:omsat_app/logic/location_manager_ui_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
@@ -56,12 +57,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     TcpListener(peerList, Peer.defaultListeningPort).startListening();
     Connector(peerList, templateMessage).startConnecting();
+    var locationManagerUI = LocationManagerUI(templateMessage);
 
     loadPreferences();
 
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => peerList),
+        ChangeNotifierProvider(create: (_) => locationManagerUI),
       ],
       child: MaterialApp(
         title: 'OMSAT',
@@ -73,3 +76,6 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
+//TODO: clear peer list
+//TODO: direction of other guy

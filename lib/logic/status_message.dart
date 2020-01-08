@@ -5,6 +5,7 @@ class StatusMessage {
   PeerList peerList;
   String name;
   String uuid;
+  LocationJsonable location;
 
   StatusMessage(this.listeningPort, this.peerList, this.name, this.uuid);
 
@@ -17,6 +18,7 @@ class StatusMessage {
     peerList = PeerList.fromJson(json['peerList']);
     name = json['name'];
     uuid = json['uuid'];
+    location = LocationJsonable.fromJson(json['location']);
   }
 
   Map<String, dynamic> toJson() {
@@ -25,6 +27,7 @@ class StatusMessage {
       'peerList': peerList,
       'name': name,
       'uuid': uuid,
+      'location': location,
     };
   }
 

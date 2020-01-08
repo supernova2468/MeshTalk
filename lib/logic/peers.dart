@@ -1,6 +1,31 @@
 import 'package:omsat_app/logic/status_message.dart';
 import 'package:omsat_app/logic/connector.dart';
 
+class LocationJsonable {
+  double latitude;
+  double longitude;
+
+  LocationJsonable.fromCoordinates(this.latitude, this.longitude);
+
+  LocationJsonable();
+
+  LocationJsonable.fromJson(Map<String, dynamic> json) {
+    latitude = json['latitude'];
+    longitude = json['longitude'];
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'latitude': latitude,
+      'longitude': longitude,
+    };
+  }
+
+  String toString() {
+    return this.toJson().toString();
+  }
+}
+
 class Peer {
   static final defaultListeningPort = 25578;
   String host;
@@ -10,6 +35,7 @@ class Peer {
   PeerList parentListUI; //if there is a ui capture that peerlist
   String name = 'Unknown Peer';
   String uuid;
+  LocationJsonable location = LocationJsonable();
 
   Peer(String hostIn) {
     this.host = hostIn;
@@ -100,6 +126,7 @@ class PeerList {
       //data we only fill when receiving from a message is filled here
       peer.name = newMessage.name;
       peer.uuid = newMessage.uuid;
+      peer.location = newMessage.location;
     }
     peer.incomingConnection = true;
 

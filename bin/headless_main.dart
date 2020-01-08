@@ -2,7 +2,6 @@ import 'package:omsat_app/logic/listener.dart';
 import 'package:omsat_app/logic/peers.dart';
 import 'package:omsat_app/logic/connector.dart';
 import 'package:omsat_app/logic/status_message.dart';
-import 'package:uuid/uuid.dart';
 
 main(List<String> arguments) {
   var listeningPort = int.parse(arguments[1]);
@@ -19,6 +18,9 @@ main(List<String> arguments) {
 
   var templateMessage = StatusMessage(
       listeningPort, myPeerList, 'test peer on $listeningPort', uuid);
+
+  templateMessage.location =
+      LocationJsonable.fromCoordinates(37.2824, -121.8876);
 
   Connector(myPeerList, templateMessage).startConnecting();
 }

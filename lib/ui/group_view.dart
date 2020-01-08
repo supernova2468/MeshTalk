@@ -4,7 +4,7 @@ class GroupViewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      child: Text('group screen'),
+      child: Text('group screen, under construction, go to peer screen'),
     );
   }
 }
