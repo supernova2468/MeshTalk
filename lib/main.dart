@@ -77,5 +77,10 @@ class MyApp extends StatelessWidget {
   }
 }
 
+//TODO: bug had to double tap gps
+//TODO: myself showed up in peer list
+//TODO: outgoing connection wasn't really there, caused a crash
+//TODO: need tests
 //TODO: clear peer list
+//TODO: time since last movement
 //TODO: direction of other guy

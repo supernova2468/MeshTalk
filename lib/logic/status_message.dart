@@ -18,7 +18,11 @@ class StatusMessage {
     peerList = PeerList.fromJson(json['peerList']);
     name = json['name'];
     uuid = json['uuid'];
-    location = LocationJsonable.fromJson(json['location']);
+    if (json['location'] != null) {
+      location = LocationJsonable.fromJson(json['location']);
+    } else {
+      location = LocationJsonable();
+    }
   }
 
   Map<String, dynamic> toJson() {
