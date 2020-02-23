@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:wakelock/wakelock.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -7,19 +6,17 @@ import 'package:omsat_app/ui/group_view.dart';
 import 'package:omsat_app/ui/peers_view.dart';
 import 'package:omsat_app/logic/peers.dart';
 import 'package:omsat_app/logic/peer_ui_wrapper.dart';
-import 'package:omsat_app/ui/settings_view.dart';
-import 'package:omsat_app/logic/location_manager_ui_wrapper.dart';
+import 'package:omsat_app/ui/main_appbar.dart';
 
-class OmsatNavigationToolbar extends StatefulWidget {
+class OmsatMainScaffold extends StatefulWidget {
   @override
-  _OmsatNavigationToolbarState createState() => _OmsatNavigationToolbarState();
+  _OmsatMainScaffoldState createState() => _OmsatMainScaffoldState();
 }
 
-class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
+class _OmsatMainScaffoldState extends State<OmsatMainScaffold> {
   int _selectedIndex = 1;
   bool _fabVisible = true;
   TextEditingController _newPeerField = TextEditingController();
-  IconData _gpsStateIcon = Icons.gps_off;
 
   static List<Widget> _widgetOptions = <Widget>[
     GroupViewWidget(),
@@ -33,20 +30,6 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
         _fabVisible = true;
       } else {
         _fabVisible = false;
-      }
-    });
-  }
-
-  void _onGpsTapped() {
-    setState(() {
-      if (_gpsStateIcon == Icons.gps_off) {
-        Provider.of<LocationManagerUI>(context, listen: false).startTracking();
-        Wakelock.enable();
-        _gpsStateIcon = Icons.gps_fixed;
-      } else {
-        Provider.of<LocationManagerUI>(context, listen: false).stopTracking();
-        Wakelock.disable();
-        _gpsStateIcon = Icons.gps_off;
       }
     });
   }
@@ -81,20 +64,7 @@ class _OmsatNavigationToolbarState extends State<OmsatNavigationToolbar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('OMSAT App'),
-          actions: <Widget>[
-            IconButton(
-              onPressed: _onGpsTapped,
-              icon: Icon(_gpsStateIcon),
-            ),
-            IconButton(
-              onPressed: () => Navigator.push(context,
-                  CupertinoPageRoute(builder: (context) => SettingsView())),
-              icon: Icon(Icons.settings_applications),
-            ),
-          ],
-        ),
+        appBar: OmsatMainAppBar(),
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),

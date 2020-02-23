@@ -1,13 +1,13 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:omsat_app/logic/location_manager_ui_wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import 'package:preferences/preferences.dart';
 
-import 'package:omsat_app/ui/navigation_bar.dart';
+import 'package:omsat_app/logic/location_manager_ui_wrapper.dart';
+import 'package:omsat_app/ui/main_scaffold.dart';
 import 'package:omsat_app/logic/peer_ui_wrapper.dart';
 import 'package:omsat_app/logic/listener.dart';
 import 'package:omsat_app/logic/connector.dart';
@@ -71,7 +71,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.teal,
         ),
-        home: OmsatNavigationToolbar(),
+        home: OmsatMainScaffold(),
       ),
     );
   }
