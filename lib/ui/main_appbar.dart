@@ -23,10 +23,16 @@ class _OmsatMainAppBarState extends State<OmsatMainAppBar> {
         Provider.of<LocationManagerUI>(context, listen: false).startTracking();
         Wakelock.enable();
         _gpsStateIcon = Icons.gps_fixed;
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('GPS Tracking Enabled'),
+        ));
       } else {
         Provider.of<LocationManagerUI>(context, listen: false).stopTracking();
         Wakelock.disable();
         _gpsStateIcon = Icons.gps_off;
+        Scaffold.of(context).showSnackBar(SnackBar(
+          content: Text('GPS Tracking Disabled'),
+        ));
       }
     });
   }
