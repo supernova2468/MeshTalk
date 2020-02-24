@@ -11,9 +11,9 @@ jobs:
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
-    - name: Install dependencies
+    - name: install dependencies
       run: flutter pub get
-    - name: Run tests
+    - name: run tests
       run: flutter test      
 
   analyze:
@@ -24,9 +24,9 @@ jobs:
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
-    - name: Install dependencies
+    - name: install dependencies
       run: flutter pub get
-    - name: Run tests
+    - name: run analysis
       run: flutter analyze
   
   coverage:
@@ -37,8 +37,13 @@ jobs:
     - uses: subosito/flutter-action@v1
       with:
         channel: 'stable'
-    - name: Install dependencies
+    - name: install dependencies
       run: flutter pub get
-    - name: Run tests
-      run: flutter test --coverage      
+    - name: run coverage
+      run: flutter test --coverage
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: coverage/lcov.info   
 
