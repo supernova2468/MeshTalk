@@ -1,4 +1,4 @@
-name: Run Dart/Flutter Unit Tests
+name: Run Dart/Flutter Tests, Analysis, and Coverage
 
 on: [push, pull_request]
 
@@ -15,4 +15,4 @@ jobs:
     - name: Install dependencies
       run: flutter pub get
     - name: Run tests
-      run: flutter pub run test
+      run: flutter test
