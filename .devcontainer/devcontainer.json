@@ -1,0 +1,19 @@
+{
+	"name": "Ubuntu w/ Flutter",
+	"build": {
+		"dockerfile": "../Dockerfile",
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"ms-azuretools.vscode-docker",
+		"dart-code.flutter",
+	],
+	// "runArgs": ["--privileged"],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+}
