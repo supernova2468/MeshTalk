@@ -11,7 +11,8 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     zip \
     wget \
     ca-certificates \
-    openjdk-8-jdk
+    openjdk-8-jdk \
+    ssh 
 
 # flutter
 ENV PATH="/flutter/bin:/android/cmdline-tools/latest/bin:/android/platform-tools:${PATH}"
